@@ -1,0 +1,27 @@
+#pager{
+    height:30px;
+}
+
+.selectpager{
+    border-color: #F5F5F5;
+    cursor: default; 
+    height:34px;
+    max-width: 50px; 
+    font-size:11px !important;
+}
+
+.pagerResultperPage{
+    float:right; 
+}
+
+.exportbutton{
+    margin-left:14px !important;
+}
+
+.exportTypeSelect{
+    height:30px;
+}
+
+.actionsMess{
+    margin-bottom:20px !important;
+}
