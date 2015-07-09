@@ -2,7 +2,7 @@
     "name": "tmsolution/datagrid-bundle",
     "type": "symfony-bundle",
     "description": "Symfony2 bundle for logging",
-    "keywords": ["security", "bundle"],
+    "keywords": ["datagrid", "bundle"],
     "homepage": "https://github.com/TMSolution/DataGridBundle",
     "license": "MIT",
     "authors": [
