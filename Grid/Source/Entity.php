@@ -175,7 +175,7 @@ class Entity extends Source {
         return $this->excludedColumns;
     }
     
-    public function __construct(\Core\BaseBundle\Model\Model $model, $group = 'default', $managerName = null, $metadata = null) {
+    public function __construct(\Core\ModelBundle\Model\Model $model, $group = 'default', $managerName = null, $metadata = null) {
         $this->model = $model;
         $this->entityName = $model->getEntityClass();
         $this->managerName = $managerName;
@@ -191,7 +191,7 @@ class Entity extends Source {
     /**
      * Return model.
      * 
-     * @return \Core\BaseBundle\Model\Model Model
+     * @return \Core\ModelBundle\Model\Model Model
      * @author Krzysiek Piasecki
      */
     public function getModel() {
