@@ -118,8 +118,6 @@ class Entity extends Source {
     protected $fields = array();
     protected $model = null;
     protected $reflectionClass;
-    protected $securityContext;
-    protected $aclProvider;
     protected $totalCount1 = 3;
     protected $excludedColumns=[];
 
@@ -200,8 +198,6 @@ class Entity extends Source {
 
     public function initialise($container) {
         $doctrine = $container->get('doctrine');
-        $this->securityContext = $container->get('security.context');
-        $this->aclProvider = $container->get('security.acl.provider');
         $this->manager = version_compare(Kernel::VERSION, '2.1.0', '>=') ? $doctrine->getManager($this->managerName) : $doctrine->getManager($this->managerName);
         $this->ormMetadata = $this->manager->getClassMetadata($this->entityName);
 
