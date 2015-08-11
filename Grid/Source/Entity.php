@@ -562,7 +562,7 @@ class Entity extends Source {
 
 
 
-        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'Core\BaseBundle\Walker\MysqlWalker');
+        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'TMSolution\DataGridBundle\Walker\MysqlWalker');
         $query->setHint("mysqlWalker.count", true);
 
         $items = $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
