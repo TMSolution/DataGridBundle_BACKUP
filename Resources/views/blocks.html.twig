@@ -152,14 +152,14 @@
 
                                                             {% set value=grid_cell(column,row,grid) %}
                                                             {%if value %}
-                                                                {{value|htmlentitiesdecode|raw|date('Y.m.d H:i')}}
+                                                                {{value|raw|date('Y.m.d H:i')}}
                                                             {% else %}
                                                                 <span style='color:#aaa;' >--</span>
                                                             {% endif %}
                                                         {% else %}
                                                             {% set value=grid_cell(column, row, grid) %} 
                                                             {%if value %}
-                                                                {{value|htmlentitiesdecode|raw}}
+                                                                {{value|raw}}
                                                             {% else %}
                                                                 <span style='color:#aaa;' >--</span>
                                                             {% endif %}
