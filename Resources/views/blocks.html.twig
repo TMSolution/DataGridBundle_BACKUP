@@ -188,18 +188,18 @@
                                     {{ grid_pagerfanta(grid) }}
                                 {% else %}
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-2">
+                                        <div class="col-sm-3 col-md-3">
                                             <h5>{{ grid_pager_totalcount(grid) }}</h5> 
                                         </div>
-                                        <div class="col-sm-6 col-md-3 ">
+                                        <div class="col-sm-3 col-md-3 ">
                                             {% if grid.exports|length > 0 %}
                                                 {{ grid_exports(grid) }}
                                             {% endif %}
                                         </div>
-                                        <div class="col-sm-6 col-md-3">
+                                        <div class="col-sm-3 col-md-3">
                                             {{ grid_pager_results_perpage(grid) }}
                                         </div>
-                                        <div class="col-sm-6 col-md-4">
+                                        <div class="col-sm-3 col-md-3">
                                             {{ grid_pager_selectpage(grid) }}
                                         </div>
                                     </div>
@@ -230,23 +230,23 @@
                             {% endblock grid_pager_totalcount %}
                             {# ---------------------------------------------------- grid_pager_selectpage -------------------------------------------------- #}
                             {% block grid_pager_selectpage %}
-                                {{ 'Page'|trans }}
-                                {% spaceless %}
 
-                                    <input type="button" aria-label="Previous" class=" btn btn-default" {% if grid.page <= 0 %}disabled="disabled"{% endif %} value="«" onclick="return {{ grid.hash }}_previousPage();"/>
-
-                                    <input type="text"  class="current btn input-sm form-control selectpager"  value="{{ grid.page + 1 }}" size="2" onkeypress="return {{ grid.hash }}_enterPage(event, parseInt(this.value) - 1);"/>
-                                    <input type="button" value="»" class="next  btn btn-default" {% if grid.page >= grid.pageCount-1 %}disabled="disabled"{% endif %} onclick="return {{ grid.hash }}_nextPage();"/> {{ 'of %count%'|trans({ '%count%' : grid.pageCount }) }}
-
+                                <div class="pull-right">
+                                    {{ 'Page'|trans }}
+                                    {% spaceless %}
+                                        <input type="button" aria-label="Previous" class=" btn btn-default" {% if grid.page <= 0 %}disabled="disabled"{% endif %} value="«" onclick="return {{ grid.hash }}_previousPage();"/>
+                                        <input type="text" class="current text-center form-control selectpager"  value="{{ grid.page + 1 }}" size="2" onkeypress="return {{ grid.hash }}_enterPage(event, parseInt(this.value) - 1);"/>
+                                        <input type="button" value="»" class="next  btn btn-default" {% if grid.page >= grid.pageCount-1 %}disabled="disabled"{% endif %} onclick="return {{ grid.hash }}_nextPage();"/> {{ 'of %count%'|trans({ '%count%' : grid.pageCount }) }}
+                                    </div>
                                 {% endspaceless %}
                             {% endblock grid_pager_selectpage %}
                             {# ---------------------------------------------------- grid_pager_results_perpage -------------------------------------------------- #}
                             {% block grid_pager_results_perpage %}
-                                <div class="pagerResultperPage">
+                                <div class="form-group pagerResultperPage">
                                     <label for="pager">
                                         {{ 'Display'|trans }}
                                     </label>
-                                    <select id="pager"  onchange="return {{ grid.hash }}_resultsPerPage(this.value);">
+                                    <select id="pager" class="form-control" onchange="return {{ grid.hash }}_resultsPerPage(this.value);">
                                         {% for key, value in grid.limits %}
                                             <option value="{{ key }}"{% if (key == grid.limit) %} selected="selected"{% endif %}>{{ value }}</option>
                                         {% endfor %}
@@ -282,19 +282,19 @@
                             {% endblock grid_actions %}
                             {# --------------------------------------------------- grid_exports ------------------------------------------------- #}
                             {% block grid_exports %}
-                                <div class="exports  btn-toolbar" style="float:left">
+                                <div class="exports  btn-toolbar">
                                     {% spaceless %}
-                                        <div class="col-sm-offset-8 form-group " style="margin-left:0;">
+                                        <div class="form-group">
 
                                             {# <label class="btn control-label" for="exports" >
                                                  <h5> {{ 'Export'|trans }}</h5>
                                              </label>
-                                            #} <select  class=" exportTypeSelect"  name="{{grid.hash}}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_EXPORT') }}]">
+                                            #} <select  class="form-control exportTypeSelect"  name="{{grid.hash}}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_EXPORT') }}]">
                                                 {% for key, export in grid.exports %}
                                                     <option value="{{key}}">{{ export.title|trans }}</option>
                                                 {% endfor %}
                                             </select>
-                                            <input type="submit" value="{{ 'Export'|trans }}" class="btn btn-default exportbutton"  />
+                                            <input type="submit" value="{{ 'Export'|trans }}" class="form-control btn-default exportbutton"  />
                                         </div>
 
 
