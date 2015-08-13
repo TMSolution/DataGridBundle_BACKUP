@@ -180,31 +180,32 @@
                             {% endblock grid_rows %}
                             {# ---------------------------------------------------- grid_pager -------------------------------------------------- #}
                             {% block grid_pager %}
+                               
+                                {% if grid.disablePager == false %}
+                                    {% if pagerfanta %}
+                                        {{ grid_pagerfanta(grid) }}
+                                    {% else %}
 
-
-                                {% if pagerfanta %}
-                                    {{ grid_pagerfanta(grid) }}
-                                {% else %}
-                                    <div class="row">
-                                        <div class="col-sm-3 col-md-3">
-                                            <h5>{{ grid_pager_totalcount(grid) }}</h5> 
+                                        <div class="row">
+                                            <div class="col-sm-3 col-md-3">
+                                                <h5>{{ grid_pager_totalcount(grid) }}</h5> 
+                                            </div>
+                                            <div class="col-sm-3 col-md-3 ">
+                                                {% if grid.exports|length > 0 %}
+                                                    {{ grid_exports(grid) }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-sm-3 col-md-3">
+                                                {{ grid_pager_results_perpage(grid) }}
+                                            </div>
+                                            <div class="col-sm-3 col-md-3">
+                                                {{ grid_pager_selectpage(grid) }}
+                                            </div>
                                         </div>
-                                        <div class="col-sm-3 col-md-3 ">
-                                            {% if grid.exports|length > 0 %}
-                                                {{ grid_exports(grid) }}
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-sm-3 col-md-3">
-                                            {{ grid_pager_results_perpage(grid) }}
-                                        </div>
-                                        <div class="col-sm-3 col-md-3">
-                                            {{ grid_pager_selectpage(grid) }}
-                                        </div>
-                                    </div>
 
 
-                                {% endif %}
-
+                                    {% endif %}
+                                 {% endif %}
 
                             {% endblock grid_pager %}
                             {# ---------------------------------------------------- grid_pager_totalcount -------------------------------------------------- #}
