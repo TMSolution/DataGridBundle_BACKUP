@@ -25,6 +25,7 @@ class Grid extends BaseGrid
     protected $activeColumns = array();
     protected $extraFilter = false;
     protected $resetSessionData = false;
+    protected $disablePager = true;
 
     // protected $showFilters = false;
 
@@ -34,7 +35,11 @@ class Grid extends BaseGrid
      */
     public function __construct($container, $id = '')
     {
+        
+        
         parent::__construct($container, $id);
+        
+      
     }
 
     public function setBoldColumns($columnsNames)
@@ -72,6 +77,19 @@ class Grid extends BaseGrid
     {
         return $this->bootstrapColumnSize;
     }
+
+    public function setDisablePager($disablePager)
+    {
+        $this->disablePager = $disablePager;
+    }
+
+   
+    
+    public function getDisablePager()
+    {
+        return $this->disablePager;
+    }
+  
 
     /*
      * Metoda zwraca ilość wierszy w kolumnie filtra
@@ -293,5 +311,7 @@ class Grid extends BaseGrid
 
         return $this;
     }
+
+   
 
 }
