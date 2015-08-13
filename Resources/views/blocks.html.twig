@@ -29,9 +29,7 @@
                         {{ grid_tweaks(grid) }}
                     {% endif %}
                 </div>
-                {% if withjs %}
-                    {{ grid_scripts(grid) }}
-                {% endif %}
+                
             </form>
         {% else %}
             {{ grid_no_data(grid) }}
@@ -535,22 +533,22 @@
                                                         {% block grid_scripts %}
                                                             <script type="text/javascript">
 
+                                                               // $( document ).ready(function() {
 
+                                                                    {{ grid_scripts_goto(grid) }}
+                                                                    {{ grid_scripts_reset(grid) }}
+                                                                    {{ grid_scripts_previous_page(grid) }}
+                                                                    {{ grid_scripts_next_page(grid) }}
+                                                                    {{ grid_scripts_enter_page(grid) }}
+                                                                    {{ grid_scripts_results_per_page(grid) }}
+                                                                    {{ grid_scripts_mark_visible(grid) }}
+                                                                    {{ grid_scripts_mark_all(grid) }}
+                                                                    {{ grid_scripts_switch_operator(grid) }}
+                                                                    {{ grid_scripts_submit_form(grid) }}
+                                                                    {{ grid_scripts_ajax(grid) }}
+                                                                    {# {{ grid_scripts_datetimer(grid) }}#}
 
-                                                                {{ grid_scripts_goto(grid) }}
-                                                                {{ grid_scripts_reset(grid) }}
-                                                                {{ grid_scripts_previous_page(grid) }}
-                                                                {{ grid_scripts_next_page(grid) }}
-                                                                {{ grid_scripts_enter_page(grid) }}
-                                                                {{ grid_scripts_results_per_page(grid) }}
-                                                                {{ grid_scripts_mark_visible(grid) }}
-                                                                {{ grid_scripts_mark_all(grid) }}
-                                                                {{ grid_scripts_switch_operator(grid) }}
-                                                                {{ grid_scripts_submit_form(grid) }}
-                                                                {{ grid_scripts_ajax(grid) }}
-                                                                {# {{ grid_scripts_datetimer(grid) }}#}
-
-
+                                                               // }); 
 
                                                             </script> 
 
@@ -583,7 +581,7 @@
                                                         {% block grid_scripts_reset %}
                                                             function {{ grid.hash }}_reset()
                                                             {
-
+                                                            
                                                             $('#{{ grid.hash }}_search')[0].reset();
                                                             {{ grid.hash }}_goto('{{ grid_url('reset', grid) }}');
 
