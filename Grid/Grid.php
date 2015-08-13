@@ -25,7 +25,7 @@ class Grid extends BaseGrid
     protected $activeColumns = array();
     protected $extraFilter = false;
     protected $resetSessionData = false;
-    protected $disablePager = true;
+    protected $disablePager = false;
 
     // protected $showFilters = false;
 
