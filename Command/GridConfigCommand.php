@@ -1,0 +1,126 @@
+<?php
+
+/**
+ * Copyright (c) 2014, TMSolution
+ * All rights reserved.
+ *
+ * For the full copyright and license information, please view
+ * the file LICENSE.md that was distributed with this source code.
+ */
+
+namespace TMSolution\DataGridBundle\Command;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
+use ReflectionClass;
+use LogicException;
+use UnexpectedValueException;
+
+/**
+ * GridConfigCommand generates widget class and his template.
+ * @author Mariusz Piela <mariuszpiela@gmail.com>
+ */
+class GridConfigCommand extends ContainerAwareCommand {
+
+    protected function configure() {
+        $this->setName('generate:grid:config')
+                ->setDescription('Generate widget and template')
+                ->addArgument(
+                        'entity', InputArgument::REQUIRED, 'Insert entity class name'
+        );
+    }
+
+    protected function getEntityName($input) {
+        $doctrine = $this->getContainer()->get('doctrine');
+        $entityName = str_replace('/', '\\', $input->getArgument('entity'));
+        if (($position = strpos($entityName, ':')) !== false) {
+            $entityName = $doctrine->getAliasNamespace(substr($entityName, 0, $position)) . '\\' . substr($entityName, $position + 1);
+        }
+
+        return $entityName;
+    }
+
+    protected function getClassPath($entityName) {
+        $manager = new DisconnectedMetadataFactory($this->getContainer()->get('doctrine'));
+        $classPath = $manager->getClassMetadata($entityName)->getPath();
+        return $classPath;
+    }
+    
+    protected function getGridConfigNamespaceName($entityName)
+    {   
+       
+         $entityNameArr=explode("\\", str_replace("Entity", "Grid", $entityName));
+         unset($entityNameArr[count($entityNameArr)-1]);
+         return implode("\\",$entityNameArr);
+        
+    }
+    
+
+    protected function createDirectory($classPath,$entityNamespace) {
+        
+    //    die($entityNamespace);
+        $directory = str_replace("\\", DIRECTORY_SEPARATOR, ($classPath . "\\" . $entityNamespace));
+        $directory=$this->replaceLast("Entity", "Grid", $directory);
+       
+        if (is_dir($directory) == false) {
+            if (mkdir($directory) == false) {
+                throw new UnexpectedValueException("Creating directory failed");
+            }
+        }
+    }
+
+    protected function calculateFileName($entityReflection) {
+
+        $fileName = $this->replaceLast("Entity", "Grid", $entityReflection->getFileName());
+        return $fileName;
+    }
+
+    protected function isFileNameBusy($fileName) {
+        if (file_exists($fileName) == true) {
+            throw new LogicException("File ".$fileName." exists!");
+        }
+        return false;
+    }
+    
+    
+     protected function replaceLast($search, $replace, $subject) {
+        $position = strrpos($subject, $search);
+        if ($position !== false) {
+            $subject = \substr_replace($subject, $replace, $position, strlen($search));
+        }
+        return $subject;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output) {
+
+        $entityName = $this->getEntityName($input);
+        $model=$this->getContainer()->get("model_factory")->getModel($entityName);
+        $fieldsInfo=$model->getFieldsInfo();  
+        $classPath = $this->getClassPath($entityName);
+        $entityReflection = new ReflectionClass($entityName);
+        $entityNamespace = $entityReflection->getNamespaceName();
+        $this->createDirectory($classPath,$entityNamespace);
+        $fileName=$this->calculateFileName($entityReflection);
+        $this->isFileNameBusy($fileName);
+        $objectName = $entityReflection->getShortName();
+        $templating = $this->getContainer()->get('templating');
+        $gridConfigNamespaceName=$this->getGridConfigNamespaceName($entityName);
+       
+        $renderedConfig = $templating->render("TMSolutionDataGridBundle:Command:gridconfig.template.twig", [
+            "namespace" => $entityNamespace,
+            "entityName" => $entityName,
+            "objectName" => $objectName,
+            "fieldsInfo" => $fieldsInfo,
+            "gridConfigNamespaceName" => $gridConfigNamespaceName
+        ]);
+        
+        file_put_contents($fileName, $renderedConfig);
+        $output->writeln("Grid config generated");
+    }
+
+   
+
+}
