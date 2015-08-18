@@ -1,4 +1,4 @@
-# TMSolution/DataGridBundle manual
+# TMSolution/DataGridBundle
 
 >by Damian Piela <damian.piela@tmsolution.pl>
 
