@@ -9,17 +9,16 @@
 
 DataGridBundle is a set of tools for presenting entity data in a coherent and legible form. 
 Additionally, it allows you to make use of new functionalities by adding supplementary buttons, or to display adjustable amount of data acoording to predefined values.
-
+DataGridBundle uses *apy/datagrid-bundle*.
 
 ### Installation
 
-DataGridBundle uses *apy/datagrid-bundle*, so in order to install the bundle, add: 
+In order to install the bundle, add: 
 
 ```
 //composer require
 
-"tmsolution/model-bundle":"1.*",
-"apy/datagrid-bundle": "2.*"
+"tmsolution/datagrid-bundle": "~1.2"
 ```
 
 to your project's `composer.json` file. Later, enable your bundle in the app's kernel:
