@@ -1,6 +1,7 @@
 # TMSolution/DataGridBundle installation manual
 
 >by Damian Piela <damian.piela@tmsolution.pl>
+
 ---
 
 
