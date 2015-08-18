@@ -18,7 +18,7 @@ In order to install the bundle, add:
 ```
 //composer require
 
-"tmsolution/datagrid-bundle": "~1.2"
+"tmsolution/datagrid-bundle": "1.*"
 ```
 
 to your project's `composer.json` file. Later, enable your bundle in the app's kernel:
