@@ -1,6 +1,6 @@
 # TMSolution/DataGridBundle
 
->by Damian Piela <damian.piela@tmsolution.pl>
+>by Damian Piela <damian.piela@tmsolution.pl> GitHub: <a href="https://github.com/damianpi">damianpi</a>
 
 ---
 
