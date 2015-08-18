@@ -1,4 +1,4 @@
-# TMSolution/DataGridBundle installation manual
+# TMSolution/DataGridBundle manual
 
 >by Damian Piela <damian.piela@tmsolution.pl>
 
@@ -33,6 +33,8 @@ public function registerBundles()
     $bundles = array(
         // ...
         new APY\DataGridBundle\APYDataGridBundle(),
+        new TMSolution\ModelBundle\TMSolutionModelBundle(),
+        new TMSolution\DataGridBundle\TMSolutionDataGridBundle()
     );
 }
 ```
