@@ -33,7 +33,7 @@ public function registerBundles()
     $bundles = array(
         // ...
         new APY\DataGridBundle\APYDataGridBundle(),
-        new TMSolution\ModelBundle\TMSolutionModelBundle(),
+        new Core\ModelBundle\CoreModelBundle(),
         new TMSolution\DataGridBundle\TMSolutionDataGridBundle()
     );
 }
