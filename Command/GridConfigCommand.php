@@ -52,7 +52,7 @@ class GridConfigCommand extends ContainerAwareCommand {
     protected function getGridConfigNamespaceName($entityName)
     {   
        
-         $entityNameArr=explode("\\", str_replace("Entity", "Grid", $entityName));
+         $entityNameArr=explode("\\", str_replace("Entity", "GridConfig", $entityName));
          unset($entityNameArr[count($entityNameArr)-1]);
          return implode("\\",$entityNameArr);
         
@@ -63,7 +63,7 @@ class GridConfigCommand extends ContainerAwareCommand {
         
     //    die($entityNamespace);
         $directory = str_replace("\\", DIRECTORY_SEPARATOR, ($classPath . "\\" . $entityNamespace));
-        $directory=$this->replaceLast("Entity", "Grid", $directory);
+        $directory=$this->replaceLast("Entity", "GridConfig", $directory);
        
         if (is_dir($directory) == false) {
             if (mkdir($directory) == false) {
@@ -74,7 +74,7 @@ class GridConfigCommand extends ContainerAwareCommand {
 
     protected function calculateFileName($entityReflection) {
 
-        $fileName = $this->replaceLast("Entity", "Grid", $entityReflection->getFileName());
+        $fileName = $this->replaceLast("Entity", "GridConfig", $entityReflection->getFileName());
         return $fileName;
     }
 
