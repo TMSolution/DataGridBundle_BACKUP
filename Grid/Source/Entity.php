@@ -243,12 +243,10 @@ class Entity extends Source {
         $name = $column->getField();
 
 
-        /* $isAssocciation = $column->getParam('isAssocciation');
-          if($name=='product'){
-          var_dump($isAssocciation);die();
-          } */
+         
+          
 
-        if (strpos($name, '.') !== false) {
+        /*if (strpos($name, '.') !== false) {
             $previousParent = '';
 
             $elements = explode('.', $name);
@@ -305,9 +303,12 @@ class Entity extends Source {
 
         if ($withAlias) {
             return "$name as $alias";
-        }
+        }*/
 
-        return $name;
+        if (strpos($name, '.') !== false) {
+            return '_'.$name;
+        }
+        return $this->getTableAlias().'.'.$name;
     }
 
     /**
@@ -444,6 +445,8 @@ class Entity extends Source {
                 $this->query->addSelect($fieldName);
                 $this->querySelectfromSource->addSelect($fieldName);
                 if ($column->isSorted()) {
+                    
+                    dump($this->getFieldName($column));
                     $this->query->orderBy($this->getFieldName($column), $column->getOrder());
                 }
 
