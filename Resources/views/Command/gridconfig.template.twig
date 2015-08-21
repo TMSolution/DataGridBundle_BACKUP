@@ -30,11 +30,11 @@ class {{objectName}} extends GridBuilder
         * Uncomment to use method
         */
         
-        //$this->manipulateQuery($grid);
-        ///$this->configureColumn($grid);
-        //$this->configureFilter($grid);
-        //$this->configureExport($grid);
-        //$this->configureRowButton($grid,$routePrefix);
+        $this->manipulateQuery($grid);
+        $this->configureColumn($grid);
+        $this->configureFilter($grid);
+        $this->configureExport($grid);
+        $this->configureRowButton($grid,$routePrefix);
         
         return $grid;
     }
@@ -42,21 +42,41 @@ class {{objectName}} extends GridBuilder
    protected function manipulateQuery($grid)
     {
       $tableAlias = $grid->getSource()->getTableAlias();
-      $queryFn = function ($query) use($tableAlias) {
-        $query->select({% for field, fieldParam in fieldsInfo %}{% if loop.last %}$tableAlias.'.{{field}}'{% else %}$tableAlias.'.{{field}},'.{% endif %}{% endfor %});
-        };
-      $grid->getSource()->manipulateQuery($queryFn);
+      $queryBuilderFn = function ($queryBuilder) use($tableAlias) {
+      $queryBuilder->select({% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' )  %}'_{{field}}.{{fieldParam.default_field}} as {{field}}::{{fieldParam.default_field}}{% if not loop.last %},'.{% else %}'{% endif %}{% else %}$tableAlias.'.{{field}}{% if  not loop.last %},'.{% else %}'{% endif %}{% endif %}{% endfor %});
+     
+      {% for field, fieldParam in fieldsInfo %}
+          {% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' ) %}$queryBuilder->leftJoin("$tableAlias.{{field}}","_{{field}}");{%  endif %}
+      {%  endfor %}
+      {% if  fieldParam.__many_to_many_relation_exists is defined and fieldParam.__many_to_many_relation_exists == true  %} 
+      $queryBuilder->addGroupBy($tableAlias.'id');
+      {% endif %} 
+      //dump($queryBuilder->getDQL()); //if you want to know how dql looks
+      //dump($queryBuilder->getQuery()->getSQL()); //if you want to know how dql looks  
+      };
+      $grid->getSource()->manipulateQuery($queryBuilderFn);
     }
 
     protected function configureColumn($grid)
     {
+     
+     {% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}
+             
+      $column = new {{fieldParam.default_field_type}}Column(array('id' => '{{field}}.{{fieldParam.default_field}}', 'title' => '{{field}}.{{fieldParam.default_field}}', 'source' => $grid->getSource(), 'filterable' => true, 'sortable' => true));
+      $grid->addColumn($column,$columnOrder=null);{% endif %}
+     {% endfor %}
+    
     
      {% for field, fieldParam in fieldsInfo %}{% if loop.first %}
 $grid->setDefaultOrder('{{field}}', 'asc');
 {% endif %}{% endfor %}
-     $grid->setVisibleColumns([{% for field, fieldParam in fieldsInfo %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endfor %}]);
-     $grid->setColumnsOrder([{% for field, fieldParam in fieldsInfo %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endfor %}]);
-    
+     $grid->setVisibleColumns([{% for field, fieldParam in fieldsInfo %}
+     
+     {% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
+         
+     $grid->setColumnsOrder([{% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
+
+            
     {% for field, fieldParam in fieldsInfo %}
 /** field {{field}} configuration */    
     
@@ -95,15 +115,15 @@ $grid->setDefaultOrder('{{field}}', 'asc');
     protected function configureRowButton($grid,$routePrefix)
     {
 
-        $rowAction = new RowAction('some_font', $routePrefix.'_read', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Show']);
+        $rowAction = new RowAction('glyphicon glyphicon-eye-open', $routePrefix.'_read', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Show']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
     
-        $rowAction = new RowAction('some_font', $routePrefix.'_update', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Edit']);
+        $rowAction = new RowAction('glyphicon glyphicon-edit', $routePrefix.'_update', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Edit']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
         
-        $rowAction = new RowAction('some_font', $routePrefix.'_delete', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Delete']);
+        $rowAction = new RowAction('glyphicon glyphicon-remove', $routePrefix.'_delete', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Delete']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
     }
