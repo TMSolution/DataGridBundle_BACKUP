@@ -24,6 +24,8 @@ use UnexpectedValueException;
  * @author Mariusz Piela <mariuszpiela@gmail.com>
  */
 class GridConfigCommand extends ContainerAwareCommand {
+    
+    protected $manyToManyRelationExists;
 
     protected function configure() {
         $this->setName('generate:grid:config')
@@ -48,23 +50,20 @@ class GridConfigCommand extends ContainerAwareCommand {
         $classPath = $manager->getClassMetadata($entityName)->getPath();
         return $classPath;
     }
-    
-    protected function getGridConfigNamespaceName($entityName)
-    {   
-       
-         $entityNameArr=explode("\\", str_replace("Entity", "GridConfig", $entityName));
-         unset($entityNameArr[count($entityNameArr)-1]);
-         return implode("\\",$entityNameArr);
-        
-    }
-    
 
-    protected function createDirectory($classPath,$entityNamespace) {
-        
-    //    die($entityNamespace);
+    protected function getGridConfigNamespaceName($entityName) {
+
+        $entityNameArr = explode("\\", str_replace("Entity", "GridConfig", $entityName));
+        unset($entityNameArr[count($entityNameArr) - 1]);
+        return implode("\\", $entityNameArr);
+    }
+
+    protected function createDirectory($classPath, $entityNamespace) {
+
+        //    die($entityNamespace);
         $directory = str_replace("\\", DIRECTORY_SEPARATOR, ($classPath . "\\" . $entityNamespace));
-        $directory=$this->replaceLast("Entity", "GridConfig", $directory);
-       
+        $directory = $this->replaceLast("Entity", "GridConfig", $directory);
+
         if (is_dir($directory) == false) {
             if (mkdir($directory) == false) {
                 throw new UnexpectedValueException("Creating directory failed");
@@ -80,13 +79,12 @@ class GridConfigCommand extends ContainerAwareCommand {
 
     protected function isFileNameBusy($fileName) {
         if (file_exists($fileName) == true) {
-            throw new LogicException("File ".$fileName." exists!");
+            throw new LogicException("File " . $fileName . " exists!");
         }
         return false;
     }
-    
-    
-     protected function replaceLast($search, $replace, $subject) {
+
+    protected function replaceLast($search, $replace, $subject) {
         $position = strrpos($subject, $search);
         if ($position !== false) {
             $subject = \substr_replace($subject, $replace, $position, strlen($search));
@@ -94,33 +92,65 @@ class GridConfigCommand extends ContainerAwareCommand {
         return $subject;
     }
 
+    protected function analizeFieldName($fieldsInfo) {
+
+
+        foreach ($fieldsInfo as $key => $value) {
+            
+            
+            if ( array_key_exists("association", $fieldsInfo[$key]) && ( $fieldsInfo[$key]["association"] == "ManyToOne" || $fieldsInfo[$key]["association"] == "ManyToMany" ) ) {
+                
+                if($fieldsInfo[$key]["association"] == "ManyToMany")
+                {
+                    $this->manyToManyRelationExists=true;
+                }
+                
+                
+                $model = $this->getContainer()->get("model_factory")->getModel($fieldsInfo[$key]["object_name"]);
+                 if ($model->checkPropertyByName("name")) {
+                    $fieldsInfo[$key]["default_field"] = "name";
+                    $fieldsInfo[$key]["default_field_type"]="Text";
+                    
+                 } else {
+                    $fieldsInfo[$key]["default_field"] = "id";
+                    $fieldsInfo[$key]["default_field_type"]="Number";
+                    
+                 }
+                 
+            }
+        }
+
+        return $fieldsInfo;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
 
         $entityName = $this->getEntityName($input);
-        $model=$this->getContainer()->get("model_factory")->getModel($entityName);
-        $fieldsInfo=$model->getFieldsInfo();  
+        $model = $this->getContainer()->get("model_factory")->getModel($entityName);
+        $fieldsInfo = $this->analizeFieldName($model->getFieldsInfo());
         $classPath = $this->getClassPath($entityName);
         $entityReflection = new ReflectionClass($entityName);
         $entityNamespace = $entityReflection->getNamespaceName();
-        $this->createDirectory($classPath,$entityNamespace);
-        $fileName=$this->calculateFileName($entityReflection);
-        $this->isFileNameBusy($fileName);
+        $this->createDirectory($classPath, $entityNamespace);
+        $fileName = $this->calculateFileName($entityReflection);
+        
         $objectName = $entityReflection->getShortName();
         $templating = $this->getContainer()->get('templating');
-        $gridConfigNamespaceName=$this->getGridConfigNamespaceName($entityName);
-       
+        $gridConfigNamespaceName = $this->getGridConfigNamespaceName($entityName);
+        
+        dump($fieldsInfo);
+        $this->isFileNameBusy($fileName);
         $renderedConfig = $templating->render("TMSolutionDataGridBundle:Command:gridconfig.template.twig", [
             "namespace" => $entityNamespace,
             "entityName" => $entityName,
             "objectName" => $objectName,
             "fieldsInfo" => $fieldsInfo,
-            "gridConfigNamespaceName" => $gridConfigNamespaceName
+            "gridConfigNamespaceName" => $gridConfigNamespaceName,
+            "many_to_many_relation_exists" => $this->manyToManyRelationExists
         ]);
-        
+
         file_put_contents($fileName, $renderedConfig);
         $output->writeln("Grid config generated");
     }
-
-   
 
 }

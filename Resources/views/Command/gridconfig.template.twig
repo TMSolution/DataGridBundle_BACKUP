@@ -26,9 +26,6 @@ class {{objectName}} extends GridBuilder
 
     public function buildGrid($grid,$routePrefix)
     {
-        /**
-        * Uncomment to use method
-        */
         
         $this->manipulateQuery($grid);
         $this->configureColumn($grid);
@@ -43,16 +40,16 @@ class {{objectName}} extends GridBuilder
     {
       $tableAlias = $grid->getSource()->getTableAlias();
       $queryBuilderFn = function ($queryBuilder) use($tableAlias) {
-      $queryBuilder->select({% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' )  %}'_{{field}}.{{fieldParam.default_field}} as {{field}}::{{fieldParam.default_field}}{% if not loop.last %},'.{% else %}'{% endif %}{% else %}$tableAlias.'.{{field}}{% if  not loop.last %},'.{% else %}'{% endif %}{% endif %}{% endfor %});
-     
-      {% for field, fieldParam in fieldsInfo %}
-          {% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' ) %}$queryBuilder->leftJoin("$tableAlias.{{field}}","_{{field}}");{%  endif %}
-      {%  endfor %}
-      {% if  fieldParam.__many_to_many_relation_exists is defined and fieldParam.__many_to_many_relation_exists == true  %} 
-      $queryBuilder->addGroupBy($tableAlias.'id');
+       $queryBuilder->select({% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' )  %}'_{{field}}.{{fieldParam.default_field}} as {{field}}::{{fieldParam.default_field}}{% if not loop.last %},'.{% else %}'{% endif %}{% else %}$tableAlias.'.{{field}}{% if  not loop.last %},'.{% else %}'{% endif %}{% endif %}{% endfor %});
+
+{% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' ) %}
+       $queryBuilder->leftJoin("$tableAlias.{{field}}","_{{field}}");
+{%  endif %}{%  endfor %}
+      {% if  many_to_many_relation_exists is defined and many_to_many_relation_exists == true  %} 
+       $queryBuilder->addGroupBy($tableAlias.'.id');
       {% endif %} 
-      //dump($queryBuilder->getDQL()); //if you want to know how dql looks
-      //dump($queryBuilder->getQuery()->getSQL()); //if you want to know how dql looks  
+       //dump($queryBuilder->getDQL()); //if you want to know how dql looks
+       //dump($queryBuilder->getQuery()->getSQL()); //if you want to know how dql looks  
       };
       $grid->getSource()->manipulateQuery($queryBuilderFn);
     }
@@ -63,35 +60,31 @@ class {{objectName}} extends GridBuilder
      {% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}
              
       $column = new {{fieldParam.default_field_type}}Column(array('id' => '{{field}}.{{fieldParam.default_field}}', 'title' => '{{field}}.{{fieldParam.default_field}}', 'source' => $grid->getSource(), 'filterable' => true, 'sortable' => true));
-      $grid->addColumn($column,$columnOrder=null);{% endif %}
+      $grid->addColumn($column,$columnOrder=null);
+      {% endif %}
      {% endfor %}
     
-    
      {% for field, fieldParam in fieldsInfo %}{% if loop.first %}
-$grid->setDefaultOrder('{{field}}', 'asc');
+ $grid->setDefaultOrder('{{field}}', 'asc');
 {% endif %}{% endfor %}
-     $grid->setVisibleColumns([{% for field, fieldParam in fieldsInfo %}
-     
-     {% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
-         
-     $grid->setColumnsOrder([{% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
+      $grid->setVisibleColumns([{% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
+      $grid->setColumnsOrder([{% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}{% if loop.last %}'{{field}}.{{fieldParam.default_field}}'{% else %}'{{field}}.{{fieldParam.default_field}}',{% endif %}{% else %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endif %}{% endfor %}]);
 
-            
     {% for field, fieldParam in fieldsInfo %}
 /** field {{field}} configuration */    
     
     /*
-    //$column->setSafe(false); // not convert html entities
-    $column = $grid->getColumn('{{field}}');
-    $column->manipulateRenderCell(function($value, $row) {
-    //return strip_tags($value); //use this function when setSafe is false
-    return $value;
-          });
-    $column->setTitle('{{objectName}}.{{field}}');
+      //$column->setSafe(false); // not convert html entities
+    {% if  fieldParam.association is defined and (fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany')  %}$column = $grid->getColumn('{{field}}.{{fieldParam.default_field}}'); 
+      $column->setTitle('{{objectName}}.{{field}}.{{fieldParam.default_field}}');{% else %}  $column = $grid->getColumn('{{field}}'); 
+      $column->setTitle('{{objectName}}.{{field}}');{% endif %}    
+      $column->manipulateRenderCell(function($value, $row) {
+       //return strip_tags($value); //use this function when setSafe is false
+       return $value;
+      });
+   
     */
-    
     {% endfor %}  
-
     }
 
     protected function configureFilter($grid)
@@ -109,7 +102,6 @@ $grid->setDefaultOrder('{{field}}', 'asc');
           $grid->addExport(new CSVExport('CSV'));
           $grid->addExport(new XMLExport('XML'));
           
-    
     }
 
     protected function configureRowButton($grid,$routePrefix)

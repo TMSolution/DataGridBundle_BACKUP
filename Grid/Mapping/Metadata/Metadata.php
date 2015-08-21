@@ -20,6 +20,7 @@ class Metadata extends BaseMetadata {
     protected $model = null;
 
     public function __construct($model) {
+     
         $this->model = $model;
     }
     

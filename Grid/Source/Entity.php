@@ -1011,6 +1011,7 @@ class Entity extends Source {
             // var_dump($field);
 
             if ($field["isAssociation"] === true) {
+                /*
 
                 if ($this->hasAssociatedObjectField($field['fieldName'], "name")) {
 
@@ -1024,7 +1025,7 @@ class Entity extends Source {
                     }
 
                     $fieldsMappings[$fieldName] = array("title" => $fieldName, "source" => true, "field" => $fieldName, "id" => $fieldName, "type" => $type, 'associated' => true);
-                }
+                }*/
             } else {
 
 

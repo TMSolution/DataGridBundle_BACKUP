@@ -6,7 +6,7 @@ class GridBuilder
 {
 
     
-    public function buildGrid($grid)
+    public function buildGrid($grid,$routePrefix)
     {
         return $grid;
     }
