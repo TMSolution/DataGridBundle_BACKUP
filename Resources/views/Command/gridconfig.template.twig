@@ -24,7 +24,7 @@ use TMSolution\DataGridBundle\GridBuilder\GridBuilder;
 class {{objectName}} extends GridBuilder
 {
 
-    public function buildGrid($grid)
+    public function buildGrid($grid,$routePrefix)
     {
         /**
         * Uncomment to use method
@@ -34,7 +34,7 @@ class {{objectName}} extends GridBuilder
         ///$this->configureColumn($grid);
         //$this->configureFilter($grid);
         //$this->configureExport($grid);
-        //$this->configureRowButton($grid);
+        //$this->configureRowButton($grid,$routePrefix);
         
         return $grid;
     }
@@ -59,9 +59,12 @@ $grid->setDefaultOrder('{{field}}', 'asc');
     
     {% for field, fieldParam in fieldsInfo %}
 /** field {{field}} configuration */    
+    
     /*
+    //$column->setSafe(false); // not convert html entities
     $column = $grid->getColumn('{{field}}');
     $column->manipulateRenderCell(function($value, $row) {
+    //return strip_tags($value); //use this function when setSafe is false
     return $value;
           });
     $column->setTitle('{{objectName}}.{{field}}');
@@ -82,25 +85,25 @@ $grid->setDefaultOrder('{{field}}', 'asc');
     protected function configureExport($grid)
     {
            
-          $grid->addExport(new ExcelExport($this->exports['Excel']));
-          $grid->addExport(new CSVExport($this->exports['CSV']));
-          $grid->addExport(new XMLExport($this->exports['XML']));
+          $grid->addExport(new ExcelExport('Excel'));
+          $grid->addExport(new CSVExport('CSV'));
+          $grid->addExport(new XMLExport('XML'));
           
     
     }
 
-    protected function configureRowButton($grid)
+    protected function configureRowButton($grid,$routePrefix)
     {
 
-        $rowAction = new RowAction('some_font', 'core_prototype_defaultcontroller_read', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Show']);
+        $rowAction = new RowAction('some_font', $routePrefix.'_read', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Show']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
     
-        $rowAction = new RowAction('some_font', 'core_prototype_defaultcontroller_update', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Edit']);
+        $rowAction = new RowAction('some_font', $routePrefix.'_update', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Edit']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
         
-        $rowAction = new RowAction('some_font', 'core_prototype_defaultcontroller_delete', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Delete']);
+        $rowAction = new RowAction('some_font', $routePrefix.'_delete', false, null, ['id' => 'button-id', 'class' => 'button-class', 'data-original-title' => 'Delete']);
         $rowAction->setRouteParameters(['entityName' => '{{objectName|lower}}','id']);
         $grid->addRowAction($rowAction);
     }
