@@ -16,7 +16,7 @@ use TMSolution\DataGridBundle\Grid\Column\Column;
 use TMSolution\DataGridBundle\Grid\Column\DateTimeColumn;
 use APY\DataGridBundle\Grid\Rows;
 use APY\DataGridBundle\Grid\Row;
-use APY\DataGridBundle\Grid\Source\Source;
+use APY\DataGridBundle\Grid\Source\Entity as ApySourceEntity;
 use APY\DataGridBundle\Grid\Helper\ORMCountWalker;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
@@ -28,7 +28,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class Entity extends Source {
+class Entity extends ApySourceEntity
+{
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -119,7 +120,7 @@ class Entity extends Source {
     protected $model = null;
     protected $reflectionClass;
     protected $totalCount1 = 3;
-    protected $excludedColumns=[];
+    protected $excludedColumns = [];
 
     /**
      * Legacy way of accessing the default alias (before it became possible to change it)
@@ -164,16 +165,16 @@ class Entity extends Source {
 
     public function setExcludedColumns($excludedColumns)
     {
-        $this->excludedColumns=$excludedColumns;
-        
+        $this->excludedColumns = $excludedColumns;
     }
 
     public function getExcludedColumns()
     {
         return $this->excludedColumns;
     }
-    
-    public function __construct(\Core\ModelBundle\Model\Model $model, $group = 'default', $managerName = null, $metadata = null) {
+
+    public function __construct(\Core\ModelBundle\Model\Model $model, $group = 'default', $managerName = null, $metadata = null)
+    {
         $this->model = $model;
         $this->entityName = $model->getEntityClass();
         $this->managerName = $managerName;
@@ -192,11 +193,13 @@ class Entity extends Source {
      * @return \Core\ModelBundle\Model\Model Model
      * @author Krzysiek Piasecki
      */
-    public function getModel() {
+    public function getModel()
+    {
         return $this->model;
     }
 
-    public function initialise($container) {
+    public function initialise($container)
+    {
         $doctrine = $container->get('doctrine');
         $this->manager = version_compare(Kernel::VERSION, '2.1.0', '>=') ? $doctrine->getManager($this->managerName) : $doctrine->getManager($this->managerName);
         $this->ormMetadata = $this->manager->getClassMetadata($this->entityName);
@@ -215,7 +218,8 @@ class Entity extends Source {
         $this->groupBy = $this->metadata->getGroupBy();
     }
 
-    public function createQueryFilters($grid) {
+    public function createQueryFilters($grid)
+    {
 
 
 
@@ -239,83 +243,84 @@ class Entity extends Source {
      * @param \APY\DataGridBundle\Grid\Column\Column $column
      * @return string
      */
-    protected function getFieldName($column, $withAlias = false) {
-        $name = $column->getField();
-
-
-         
-          
-
-        /*if (strpos($name, '.') !== false) {
-            $previousParent = '';
-
-            $elements = explode('.', $name);
-            while ($element = array_shift($elements)) {
-                if (count($elements) > 0) {
-                    $parent = ($previousParent == '') ? $this->getTableAlias() : $previousParent;
-                    $previousParent .= '_' . $element;
+    /* protected function getFieldName($column, $withAlias = false) {
+      $name = $column->getField();
 
 
 
+     */
 
-                    $joinType = $column->getJoinType();
+    /* if (strpos($name, '.') !== false) {
+      $previousParent = '';
+
+      $elements = explode('.', $name);
+      while ($element = array_shift($elements)) {
+      if (count($elements) > 0) {
+      $parent = ($previousParent == '') ? $this->getTableAlias() : $previousParent;
+      $previousParent .= '_' . $element;
 
 
 
-                    $this->joins[$previousParent] = array('field' => $parent . '.' . $element, 'type' => $joinType);
-                } else {
-                    $name = $previousParent . '.' . $element;
-                }
-            }
 
-            $alias = str_replace('.', '::', $column->getId());
-        } elseif (strpos($name, ':') !== false) {
-            $previousParent = $this->getTableAlias();
-            $alias = $name;
-        } else {
-            return $this->getTableAlias() . '.' . $name;
-        }
+      $joinType = $column->getJoinType();
 
-        // Aggregate dql functions
-        $matches = array();
-        if ($column->hasDQLFunction($matches)) {
-            if (strtolower($matches['parameters']) == 'distinct') {
-                $functionWithParameters = $matches['function'] . '(DISTINCT ' . $previousParent . '.' . $matches['field'] . ')';
-            } else {
-                $parameters = '';
-                if ($matches['parameters'] !== '') {
-                    $parameters = ', ' . (is_numeric($matches['parameters']) ? $matches['parameters'] : "'" . $matches['parameters'] . "'");
-                }
 
-                $functionWithParameters = $matches['function'] . '(' . $previousParent . '.' . $matches['field'] . $parameters . ')';
-            }
 
-            if ($withAlias) {
-                // Group by the primary field of the previous entity
-                $this->query->addGroupBy($previousParent);
-                $this->querySelectfromSource->addGroupBy($previousParent);
+      $this->joins[$previousParent] = array('field' => $parent . '.' . $element, 'type' => $joinType);
+      } else {
+      $name = $previousParent . '.' . $element;
+      }
+      }
 
-                return "$functionWithParameters as $alias";
-            }
+      $alias = str_replace('.', '::', $column->getId());
+      } elseif (strpos($name, ':') !== false) {
+      $previousParent = $this->getTableAlias();
+      $alias = $name;
+      } else {
+      return $this->getTableAlias() . '.' . $name;
+      }
 
-            return $alias;
-        }
+      // Aggregate dql functions
+      $matches = array();
+      if ($column->hasDQLFunction($matches)) {
+      if (strtolower($matches['parameters']) == 'distinct') {
+      $functionWithParameters = $matches['function'] . '(DISTINCT ' . $previousParent . '.' . $matches['field'] . ')';
+      } else {
+      $parameters = '';
+      if ($matches['parameters'] !== '') {
+      $parameters = ', ' . (is_numeric($matches['parameters']) ? $matches['parameters'] : "'" . $matches['parameters'] . "'");
+      }
 
-        if ($withAlias) {
-            return "$name as $alias";
-        }*/
+      $functionWithParameters = $matches['function'] . '(' . $previousParent . '.' . $matches['field'] . $parameters . ')';
+      }
 
-        if (strpos($name, '.') !== false) {
-            return '_'.$name;
-        }
-        return $this->getTableAlias().'.'.$name;
-    }
+      if ($withAlias) {
+      // Group by the primary field of the previous entity
+      $this->query->addGroupBy($previousParent);
+      $this->querySelectfromSource->addGroupBy($previousParent);
+
+      return "$functionWithParameters as $alias";
+      }
+
+      return $alias;
+      }
+
+      if ($withAlias) {
+      return "$name as $alias";
+      } */
+    /*
+      if (strpos($name, '.') !== false) {
+      return '_'.$name;
+      }
+      return $this->getTableAlias().'.'.$name;
+      } */
 
     /**
      * @param string $fieldName
      * @return string
      */
-    protected function getGroupByFieldName($fieldName) {
+    protected function getGroupByFieldName($fieldName)
+    {
         if (strpos($fieldName, '.') !== false) {
             $previousParent = '';
 
@@ -342,13 +347,15 @@ class Entity extends Source {
      * @param \TMSolution\DataGridBundle\Grid\Columns $columns
      * @return null
      */
-    public function getColumns($columns) {
+    public function getColumns($columns)
+    {
         foreach ($this->metadata->getColumnsFromMapping($columns) as $column) {
             $columns->addColumn($column);
         }
     }
 
-    protected function normalizeOperator($operator) {
+    protected function normalizeOperator($operator)
+    {
 
 
         switch ($operator) {
@@ -363,7 +370,8 @@ class Entity extends Source {
         }
     }
 
-    protected function normalizeValue($operator, $value) {
+    protected function normalizeValue($operator, $value)
+    {
 
 
         switch ($operator) {
@@ -391,7 +399,8 @@ class Entity extends Source {
      * Sets the initial QueryBuilder for this DataGrid
      * @param QueryBuilder $queryBuilder
      */
-    public function initQueryBuilder(QueryBuilder $queryBuilder) {
+    public function initQueryBuilder(QueryBuilder $queryBuilder)
+    {
         $this->queryBuilder = clone $queryBuilder;
 
         //Try to guess the new root alias and apply it to our queries+        
@@ -405,7 +414,8 @@ class Entity extends Source {
     /**
      * @return QueryBuilder
      */
-    protected function getQueryBuilder() {
+    protected function getQueryBuilder()
+    {
         //If a custom QB has been provided, use that
         //Otherwise create our own basic one
         if ($this->queryBuilder instanceof QueryBuilder) {
@@ -427,7 +437,8 @@ class Entity extends Source {
      * @param type $gridDataJunction
      * @return \APY\DataGridBundle\Grid\Rows
      */
-    public function execute($columns, $page = 0, $limit = 0, $maxResults = null, $gridDataJunction = Column::DATA_CONJUNCTION) {
+    public function execute($columns, $page = 0, $limit = 0, $maxResults = null, $gridDataJunction = Column::DATA_CONJUNCTION)
+    {
 
         $this->query = $this->getQueryBuilder();
         $this->querySelectfromSource = clone $this->query;
@@ -439,14 +450,17 @@ class Entity extends Source {
 
 
         foreach ($columns as $column) {
-            if (!in_array($column->getId(),$this->excludedColumns)) {
+            if (!in_array($column->getId(), $this->excludedColumns)) {
 
-                $fieldName = $this->getFieldName($column, true);
-                $this->query->addSelect($fieldName);
-                $this->querySelectfromSource->addSelect($fieldName);
+                if ($column->getIsManualField() === false) {
+                    $fieldName = $this->getFieldName($column, true);
+                    $this->query->addSelect($fieldName);
+                    $this->querySelectfromSource->addSelect($fieldName);
+                }
+                
                 if ($column->isSorted()) {
-                    
-                    dump($this->getFieldName($column));
+
+                    //dump($this->getFieldName($column));
                     $this->query->orderBy($this->getFieldName($column), $column->getOrder());
                 }
 
@@ -458,7 +472,7 @@ class Entity extends Source {
 
                     $isDisjunction = $column->getDataJunction() === Column::DATA_DISJUNCTION;
 
-                    $hasHavingClause = $column->hasDQLFunction();
+                    $hasHavingClause = $column->hasDQLFunction() || $column->getIsAggregate();;
 
                     $sub = $isDisjunction ? $this->query->expr()->orx() : ($hasHavingClause ? $this->query->expr()->andx() : $where);
 
@@ -632,7 +646,8 @@ class Entity extends Source {
         return $result;
     }
 
-    public function getTotalCount($maxResults = null) {
+    public function getTotalCount($maxResults = null)
+    {
 
 
 
@@ -666,7 +681,8 @@ class Entity extends Source {
         return $this->totalCount;
     }
 
-    public function prepareTotalCount() {
+    public function prepareTotalCount()
+    {
 
         $sql = 'SELECT FOUND_ROWS() AS foundRows';
         $rsm = new ResultSetMapping();
@@ -700,7 +716,8 @@ class Entity extends Source {
       return  count($paginator);
       } */
 
-    public function getFieldsMetadata($class, $group = 'default') {
+    public function getFieldsMetadata($class, $group = 'default')
+    {
         $result = array();
 
 
@@ -766,7 +783,8 @@ class Entity extends Source {
         return $result;
     }
 
-    protected function calculateAssociacion($field) {
+    protected function calculateAssociacion($field)
+    {
 
         $fieldNameArr = explode('.', $field);
         if (count($fieldNameArr) == 2) {
@@ -776,7 +794,8 @@ class Entity extends Source {
         }
     }
 
-    public function populateSelectFilters($columns, $loop = false) {
+    public function populateSelectFilters($columns, $loop = false)
+    {
 
         foreach ($columns as $column) {
             $selectFrom = $column->getSelectFrom();
@@ -896,7 +915,8 @@ class Entity extends Source {
         }
     }
 
-    public function delete(array $ids) {
+    public function delete(array $ids)
+    {
         $repository = $this->getRepository();
 
         foreach ($ids as $id) {
@@ -912,19 +932,23 @@ class Entity extends Source {
         $this->manager->flush();
     }
 
-    public function getRepository() {
+    public function getRepository()
+    {
         return $this->manager->getRepository($this->entityName);
     }
 
-    public function getHash() {
+    public function getHash()
+    {
         return $this->entityName;
     }
 
-    public function addHint($key, $value) {
+    public function addHint($key, $value)
+    {
         $this->hints[$key] = $value;
     }
 
-    public function clearHints() {
+    public function clearHints()
+    {
         $this->hints = array();
     }
 
@@ -932,29 +956,34 @@ class Entity extends Source {
      *  Set groupby column
      *  @param string $groupBy GroupBy column
      */
-    public function setGroupBy($groupBy) {
+    public function setGroupBy($groupBy)
+    {
         $this->groupBy = $groupBy;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return $this->entityName;
     }
 
     /**
      * @param string $tableAlias
      */
-    public function setTableAlias($tableAlias) {
+    public function setTableAlias($tableAlias)
+    {
         $this->tableAlias = $tableAlias;
     }
 
     /**
      * @return string
      */
-    public function getTableAlias() {
+    public function getTableAlias()
+    {
         return $this->tableAlias;
     }
 
-    protected function initializeFields() {
+    protected function initializeFields()
+    {
 
 
         if (empty($this->fields)) {
@@ -983,12 +1012,14 @@ class Entity extends Source {
         return $this->fields;
     }
 
-    public function getField($name) {
+    public function getField($name)
+    {
         $this->initializeFields();
         return $this->fields[$name];
     }
 
-    public function hasAssociatedObjectField($associatedFieldName, $fieldName) {
+    public function hasAssociatedObjectField($associatedFieldName, $fieldName)
+    {
         $associatedField = $this->getField($associatedFieldName);
         $metadata = $this->model->getManager()->getClassMetadata($associatedField["mapping"]["targetEntity"]);
         if ($metadata->hasField($fieldName)) {
@@ -1001,7 +1032,8 @@ class Entity extends Source {
      * Zwraca tablicę metadata do konfiguracji grida.
      * UWAGA! To nie jest Metadata z Doctrina
      */
-    public function createMetadata() {
+    public function createMetadata()
+    {
 
 
         $fields = $this->initializeFields();
@@ -1016,19 +1048,19 @@ class Entity extends Source {
             if ($field["isAssociation"] === true) {
                 /*
 
-                if ($this->hasAssociatedObjectField($field['fieldName'], "name")) {
+                  if ($this->hasAssociatedObjectField($field['fieldName'], "name")) {
 
-                    $fieldName = $field['fieldName'] . ".name";
-                    $fieldsNames[] = $fieldName;
+                  $fieldName = $field['fieldName'] . ".name";
+                  $fieldsNames[] = $fieldName;
 
-                    $type = 'text';
+                  $type = 'text';
 
-                    if ($field['mapping']['type'] == ClassMetadata::MANY_TO_MANY) {
-                        $this->groupById = true;
-                    }
+                  if ($field['mapping']['type'] == ClassMetadata::MANY_TO_MANY) {
+                  $this->groupById = true;
+                  }
 
-                    $fieldsMappings[$fieldName] = array("title" => $fieldName, "source" => true, "field" => $fieldName, "id" => $fieldName, "type" => $type, 'associated' => true);
-                }*/
+                  $fieldsMappings[$fieldName] = array("title" => $fieldName, "source" => true, "field" => $fieldName, "id" => $fieldName, "type" => $type, 'associated' => true);
+                  } */
             } else {
 
 
@@ -1053,17 +1085,20 @@ class Entity extends Source {
         return $this->metadata;
     }
 
-    public function getMetadata() {
+    public function getMetadata()
+    {
         return $this->metadata;
     }
 
-    private function camelize($string) {
+    private function camelize($string)
+    {
         return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
             return ('.' === $match[1] ? '_' : '') . strtoupper($match[2]);
         }, $string);
     }
 
-    private function checkProperty($property) {
+    private function checkProperty($property)
+    {
 
         $camelProp = $this->camelize($property);
         //$this->reflectionClass = new \ReflectionClass($object);

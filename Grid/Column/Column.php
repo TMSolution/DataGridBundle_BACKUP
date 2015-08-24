@@ -126,6 +126,8 @@ abstract class Column extends BaseColumn
         $this->setSelectFrom($this->getParam('selectFrom', 'query'));
         $this->setValues($this->getParam('values', array()));
         $this->setOperatorsVisible($this->getParam('operatorsVisible', true));
+        $this->setIsManualField($this->getParam('isManualField', false));
+        $this->setIsAggregate($this->getParam('isAggregate', false));
         // Order is important for the order display
         $this->setOperators($this->getParam('operators', array(
             self::OPERATOR_EQ,
