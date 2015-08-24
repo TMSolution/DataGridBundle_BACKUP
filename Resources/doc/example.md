@@ -39,7 +39,7 @@ $queryBuilderFn = function ($queryBuilder) use($tableAlias) {
 
     $queryBuilder->resetDQLPart('select');
     $queryBuilder->resetDQLPart('join');
-    $queryBuilder->select($tableAlias.'.id,'.'_status.name as level2::name,'.'_substatus.name as level3::name');
+    $queryBuilder->select($tableAlias.'.id,'.'_level2.name as level2::name,'.'_level3.name as level3::name');
     
     $queryBuilder->leftJoin("$tableAlias.level2","_level2");
     $queryBuilder->leftJoin("_status.level3","_level3");
