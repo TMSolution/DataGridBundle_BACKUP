@@ -25,10 +25,10 @@ $grid->addColumn($column,'asc');
 ```
 **Note**: ...
 
-Present value of nested entities
+Presents value of nested entities
 =======================
 
-Present value of nested entities, regardless of the level of nesting
+Presents value of nested entities, regardless of the level of nesting
 
 ## Usage
 ```php
