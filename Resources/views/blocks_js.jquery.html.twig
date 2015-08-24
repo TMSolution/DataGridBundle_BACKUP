@@ -76,28 +76,31 @@
     $(function () {
 
     // Order and pagerfanta links
-    $('.pagination li.disabled a', '#{{ grid.hash }}').click(function (e) {
+    $(document).on('click', '.pagination li.disabled a', '#{{ grid.hash }}', function(){
+    //$('.pagination li.disabled a', '#{{ grid.hash }}').click(function (e) {
     return false;
     });
 
     // Order and pagerfanta links
-    $('a.order, nav a, a.searchOnClick, .pagination li:not(.disabled) a', '#{{ grid.hash }}').click(function () {
+    $(document).on('click', 'a.order, nav a, a.searchOnClick, .pagination li:not(.disabled) a', '#{{ grid.hash }}', function(){
+    //$('a.order, nav a, a.searchOnClick, .pagination li:not(.disabled) a', '#{{ grid.hash }}').click(function () {
+        {{ grid.hash }}_goto(this.href);
 
-
-    {{ grid.hash }}_goto(this.href);
-
-    return false;
+        return false;
     });
-
+    
+ 
     // Reset link
-    $('#{{ grid.hash }} a.grid-reset').click(function () {
+    $(document).on('click', '#{{ grid.hash }} a.grid-reset', function(){
+    //$('#{{ grid.hash }} a.grid-reset').click(function () {
     {{ grid.hash }}_reset();
 
     return false;
     });
 
     // Mass actions submit
-    $('#{{ grid.hash }} input.submit-massaction').click(function () {
+    $(document).on('click', '#{{ grid.hash }} input.submit-massaction', function(){
+    //$('#{{ grid.hash }} input.submit-massaction').click(function () {
     var selector = $('#{{ grid.hash }} .grid_massactions select');
 
     {{ grid.hash }}_goto('{{ grid.routeUrl }}', selector.attr('name') + '=' + selector.val(), 'POST');
