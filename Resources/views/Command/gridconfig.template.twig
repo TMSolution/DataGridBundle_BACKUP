@@ -46,6 +46,8 @@ class {{objectName}} extends GridBuilder
       //concat(' . $tableAlias . '.name,' . $tableAlias . '.id) as alias
       //in function addColumn set parameters: 'isManualField'=>true,'field' => 'alias'
       
+       $queryBuilder->resetDQLPart('select');
+       $queryBuilder->resetDQLPart('join');
        $queryBuilder->select({% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' )  %}'_{{field}}.{{fieldParam.default_field}} as {{field}}::{{fieldParam.default_field}}{% if not loop.last %},'.{% else %}'{% endif %}{% else %}$tableAlias.'.{{field}}{% if  not loop.last %},'.{% else %}'{% endif %}{% endif %}{% endfor %});
 
 {% for field, fieldParam in fieldsInfo %}{% if  fieldParam.association is defined and ( fieldParam.association == 'ManyToOne' or fieldParam.association == 'ManyToMany' ) %}
