@@ -4,7 +4,6 @@ Add a virtual column
 You can add a virtual or aggregate column (contact(a,b), max(a) etc.).
 Always add a column with an alias to the grid.
 
-```php
 ## Usage
 
 ```php
