@@ -5,8 +5,6 @@ You can add a virtual or aggregate column (contact(a,b), max(a) etc.).
 Always add a column with an alias to the grid.
 
 ```php
-concat(' . $tableAlias . '.name,' . $tableAlias . '.id) as alias
-
 ## Usage
 
 ```php
