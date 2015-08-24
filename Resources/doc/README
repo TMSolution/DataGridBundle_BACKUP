@@ -1,3 +1,10 @@
+# TMSolution/DataGridBundle
+
+>by Damian Piela <damian.piela@tmsolution.pl>
+
+---
+
+
 ### Description
 
 DataGridBundle is a set of tools for presenting entity data in a coherent and legible form. 
@@ -30,3 +37,4 @@ public function registerBundles()
     );
 }
 ```
+
