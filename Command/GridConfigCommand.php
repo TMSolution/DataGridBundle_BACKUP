@@ -28,7 +28,7 @@ class GridConfigCommand extends ContainerAwareCommand {
     protected $manyToManyRelationExists;
 
     protected function configure() {
-        $this->setName('generate:grid:config')
+        $this->setName('datagrid:generate:grid:config')
                 ->setDescription('Generate widget and template')
                 ->addArgument(
                         'entity', InputArgument::REQUIRED, 'Insert entity class name'
