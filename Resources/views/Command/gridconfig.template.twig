@@ -97,7 +97,11 @@ class {{objectName}} extends GridBuilder
 
     protected function configureFilter($grid)
     {
-          /** filter columns [blocks]*/      
+    
+          /* hide filters */
+          //$grid->hideFilters();
+          
+          /* filter columns [blocks]*/      
           $grid->setNumberPresentedFilterColumn(3);
           $grid->setShowFilters([{% for field, fieldParam in fieldsInfo %}{% if loop.last %}'{{field}}'{% else %}'{{field}}',{% endif %}{% endfor %}]);
           
