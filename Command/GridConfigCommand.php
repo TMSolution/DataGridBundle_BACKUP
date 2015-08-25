@@ -30,9 +30,7 @@ class GridConfigCommand extends ContainerAwareCommand {
     protected function configure() {
         $this->setName('datagrid:generate:grid:config')
                 ->setDescription('Generate widget and template')
-                ->addArgument(
-                        'entity', InputArgument::REQUIRED, 'Insert entity class name'
-        );
+                ->addArgument('entity', InputArgument::REQUIRED, 'Insert entity class name');
     }
 
     protected function getEntityName($input) {
