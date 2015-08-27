@@ -41,6 +41,54 @@ class Grid extends BaseGrid
         
       
     }
+    
+    /*UWAGA ZMIENIANE SET*/
+    protected function set($key, $data)
+    {
+        // Only the filters values are removed from the session
+        
+        
+        if (isset($data['from']) && ((is_string($data['from']) && $data['from'] === '') || (is_array($data['from']) && count($data['from']) == 0))) {
+            if (array_key_exists($key, $this->sessionData)) {
+                unset($this->sessionData[$key]);
+            }
+        } elseif ($data !== null) {
+            $this->sessionData[$key] = $data;
+        }
+    }
+    
+     protected function processSessionData()
+    {
+        // Filters 
+        
+        foreach ($this->columns as $column) {
+            if (($data = $this->get($column->getId())) !== null) {
+                $column->setData($data);
+               
+            }
+        }
+
+        // Page
+        if (($page = $this->get(self::REQUEST_QUERY_PAGE)) !== null) {
+            $this->setPage($page);
+        } else {
+            $this->setPage(0);
+        }
+
+        // Order
+        if (($order = $this->get(self::REQUEST_QUERY_ORDER)) !== null) {
+            list($columnId, $columnOrder) = explode('|', $order);
+
+            $this->columns->getColumnById($columnId)->setOrder($columnOrder);
+        }
+
+        // Limit
+        if (($limit = $this->get(self::REQUEST_QUERY_LIMIT)) !== null) {
+            $this->limit = $limit;
+        } else {
+            $this->limit = key($this->limits);
+        }
+    }
 
     public function setBoldColumns($columnsNames)
     {

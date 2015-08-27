@@ -17,6 +17,7 @@ use TMSolution\DataGridBundle\Grid\Column\DateTimeColumn;
 use APY\DataGridBundle\Grid\Rows;
 use APY\DataGridBundle\Grid\Row;
 use APY\DataGridBundle\Grid\Source\Entity as ApySourceEntity;
+//use APY\DataGridBundle\Grid\Source\Source as ApySourceEntity;
 use APY\DataGridBundle\Grid\Helper\ORMCountWalker;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
@@ -248,9 +249,9 @@ class Entity extends ApySourceEntity
 
 
 
-     */
 
-    /* if (strpos($name, '.') !== false) {
+
+      if (strpos($name, '.') !== false) {
       $previousParent = '';
 
       $elements = explode('.', $name);
@@ -307,13 +308,14 @@ class Entity extends ApySourceEntity
 
       if ($withAlias) {
       return "$name as $alias";
-      } */
-    /*
+      }
+
       if (strpos($name, '.') !== false) {
       return '_'.$name;
       }
       return $this->getTableAlias().'.'.$name;
-      } */
+      }
+     */
 
     /**
      * @param string $fieldName
@@ -457,7 +459,7 @@ class Entity extends ApySourceEntity
                     $this->query->addSelect($fieldName);
                     $this->querySelectfromSource->addSelect($fieldName);
                 }
-                
+
                 if ($column->isSorted()) {
 
                     //dump($this->getFieldName($column));
@@ -468,11 +470,11 @@ class Entity extends ApySourceEntity
 
                     // Some attributes of the column can be changed in this function
                     $filters = $column->getFilters('entity');
-
-
+       
                     $isDisjunction = $column->getDataJunction() === Column::DATA_DISJUNCTION;
 
-                    $hasHavingClause = $column->hasDQLFunction() || $column->getIsAggregate();;
+                    $hasHavingClause = $column->hasDQLFunction() || $column->getIsAggregate();
+                    
 
                     $sub = $isDisjunction ? $this->query->expr()->orx() : ($hasHavingClause ? $this->query->expr()->andx() : $where);
 
@@ -489,13 +491,15 @@ class Entity extends ApySourceEntity
                         if ($filter->getOperator() == Column::OPERATOR_NLIKE) {
                             $q = $this->query->expr()->not($q);
                         }
+                        if ($filter->getValue() /* !== null */) {
+                            $sub->add($q);
 
-                        $sub->add($q);
 
-                        if ($filter->getValue() !== null) {
+                           
                             $this->query->setParameter($bindIndex++, $this->normalizeValue($filter->getOperator(), $filter->getValue()));
                         }
                     }
+             
 
                     if ($hasHavingClause) {
                         $this->query->andHaving($sub);
@@ -511,8 +515,8 @@ class Entity extends ApySourceEntity
 
 
 
-
         if ($where->count() > 0) {
+
             //Using ->andWhere here to make sure we preserve any other where clauses present in the query builder
             //the other where clauses may have come from an external builder
             $this->query->andWhere($where);
@@ -577,7 +581,7 @@ class Entity extends ApySourceEntity
             $query->setHint($hintKey, $hintValue);
         }
 
-
+//die($query->getSQL());
 
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'TMSolution\DataGridBundle\Walker\MysqlWalker');
         $query->setHint("mysqlWalker.count", true);

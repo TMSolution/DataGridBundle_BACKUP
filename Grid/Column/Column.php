@@ -581,11 +581,14 @@ abstract class Column extends BaseColumn
     public function getFilters($source)
     {
         $filters = array();
-
+       
         if ($this->hasOperator($this->data['operator'])) {
+           
             if ($this instanceof ArrayColumn && in_array($this->data['operator'], array(self::OPERATOR_EQ, self::OPERATOR_NEQ))) {
+             
                 $filters[] = new Filter($this->data['operator'], $this->data['from']);
             } else {
+                   
                 switch ($this->data['operator']) {
                     case self::OPERATOR_BTW:
                         if ($this->data['from'] != static::DEFAULT_VALUE) {
@@ -611,11 +614,13 @@ abstract class Column extends BaseColumn
                     case self::OPERATOR_RLIKE:
                     case self::OPERATOR_LLIKE:
                         if ($this->getSelectMulti()) {
+                            
                             $this->setDataJunction(self::DATA_DISJUNCTION);
                         }
                     case self::OPERATOR_EQ:
                     case self::OPERATOR_NEQ:
                     case self::OPERATOR_NLIKE:
+                      
                         foreach ((array) $this->data['from'] as $value) {
                             $filters[] = new Filter($this->data['operator'], $value);
                         }

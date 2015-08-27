@@ -127,7 +127,7 @@
                                             {% endfor %}
                                         </div>
                                         <div class="grid-search-action">
-                                            <input type="submit" class="grid-search-submit btn btn-primary" value="{{ 'Search'|trans }}"/>
+                                            <input type="submit"  id="{{grid.hash}}_search_button"  class="grid-search-submit btn btn-primary" value="{{ 'Search'|trans }}"/>
                                             <input type="button" class="grid-search-reset btn btn-default" value="{{ 'Reset'|trans }}" onclick="return {{ grid.hash }}_reset();"/>
                                         </div>
                                     </form>
@@ -476,26 +476,26 @@
                                                             {% set isNullOperator = constant('APY\\DataGridBundle\\Grid\\Column\\Column::OPERATOR_ISNULL') %}
                                                             {% set isNotNullOperator = constant('APY\\DataGridBundle\\Grid\\Column\\Column::OPERATOR_ISNOTNULL') %}
                                                             {#{% set op = column.data.operator is defined ? column.data.operator : column.defaultOperator %}#}
-                                                            {% set op = 'eq' %}
+                                                            {% set op = 'like' %}
                                                             {% set from = column.data.from is defined ? column.data.from : null %}
                                                             {% set to = column.data.to is defined ? column.data.to : null %}
                                                             {% set multiple = column.selectMulti %}
                                                             {% set expanded = column.selectExpanded %}
-                                                            <span class="grid-filter-select">
-                                                                {# {{ grid_column_operator(column, grid, op, submitOnChange) }}#}
-                                                                <span class="grid-filter-select-query" style>
+                                                            <div class="grid-filter-select">
+                                                                 {{ grid_column_operator(column, grid, op, submitOnChange) }}
+                                                                <div class="grid-filter-select-query">
                                                                     {% if expanded %}
-                                                                        <span class="grid-filter-select-query-from" id="{{ grid.hash }}__{{ column.id }}__query__from" {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none; " disabled="disabled"' : ' ' }}>
+                                                                        <div class="grid-filter-select-expanded-query-from" id="{{ grid.hash }}__{{ column.id }}__query__from" {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none; " disabled="disabled"' : ' ' }}>
                                                                             {% for key, value in column.values %}
-                                                                                <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ grid.hash }}[{{ column.id }}][from][]" value="{{ key }}" {% if key in from %} checked="checked"{% endif %} {% if submitOnChange is sameas(true) %}onclick="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%}/><label>{{ value }}</label></span>
+                                                                                <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" class="{{ grid.hash }}_{{ column.id }}_from" name="{{ grid.hash }}[{{ column.id }}][from][]" value="{{ key }}"  checked="checked" {% if submitOnChange is sameas(true) %}onclick="{{ grid.hash }}_filter_checkbox(this); return {{ grid.hash }}_submitForm(event, this.form);"{% else %}onclick="{{ grid.hash }}_filter_checkbox(this);"{% endif %}/> <label>{{ value }}</label></span>
                                                                                     {% endfor %}
-                                                                        </span>
-                                                                        <span class="grid-filter-select-query-to " id="{{ grid.hash }}__{{ column.id }}__query__to" {{ ( op == btwOperator or op == btweOperator ) ? 'style="display:50%" ': 'style="display: none;" disabled="disabled"' }}>
+                                                                        </div>
+                                                                        <div class="grid-filter-select-expanded-query-to" id="{{ grid.hash }}__{{ column.id }}__query__to" {{ ( op == btwOperator or op == btweOperator ) ? 'style="display:50%" ': 'style="display: none;" disabled="disabled"' }}>
                                                                             {% for key, value in column.values %}
-                                                                                <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ grid.hash }}[{{ column.id }}][to]" value="{{ key }}" {% if not to is null and to == key %} checked="checked"{% endif %} {% if submitOnChange is sameas(true) %}onclick="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%}/><label>{{ value }}</label></span>
+                                                                                <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}"  class="{{ grid.hash }}_{{ column.id }}_to" name="{{ grid.hash }}[{{ column.id }}][to]"  value="{{ key }}" {% if not to is null and to == key %} checked="checked"{% endif %} {% if submitOnChange is sameas(true) %}onclick="{{ grid.hash }}_filter_checkbox(this);return {{ grid.hash }}_submitForm(event, this.form);"{% else %}onclick=" {{ grid.hash }}_filter_checkbox(this);"{% endif %}/><label>{{ value }}</label></span>
                                                                                     {% endfor %}
-                                                                        </span>
-                                                                        {% if multiple %}<input type="submit" value="{{ 'Go'|trans }}" />{% endif %}
+                                                                        </div>
+                                                                        {# {% if multiple %}<input type="submit" value="{{ 'Go'|trans }}" />{% endif %} #}
                                                                     {% else %}
                                                                         <select{% if multiple %} multiple="multiple"{% endif %} name="{{ grid.hash }}[{{ column.id }}][from][]" class="grid-filter-select-query-from form-control" id="{{ grid.hash }}__{{ column.id }}__query__from" {% if submitOnChange is sameas(true) %}onchange="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%} {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none; " disabled="disabled"' : ' ' }}>
                                                                             <option value="">-- Wszystkie --</option>
@@ -514,10 +514,10 @@
                                                                         {% if multiple %}<input type="submit" value="{{ 'Go'|trans }}" />{% endif %}
 
                                                                     {% endif %}
-                                                                </span>
+                                                                </div>
 
                                                                 <!-- </div>-->
-                                                            </span>
+                                                            </div>
                                                         {% endblock grid_column_filter_type_select %}
                                                         {# -------------------------------------------- grid_column_filter_type_massaction --------------------------------------- #}
                                                         {% block grid_column_filter_type_massaction %}
@@ -547,6 +547,7 @@
                                                                     {{ grid_scripts_switch_operator(grid) }}
                                                                     {{ grid_scripts_submit_form(grid) }}
                                                                     {{ grid_scripts_ajax(grid) }}
+                                                                    {{ grid_scripts_filter_checkbox(grid) }}
                                                                     {# {{ grid_scripts_datetimer(grid) }}#}
 
                                                                // }); 
@@ -570,6 +571,24 @@
                                                             }
                                                         {% endblock %}#}
 
+                                                        {% block grid_scripts_filter_checkbox %}
+                                                            function {{ grid.hash }}_filter_checkbox(element)
+                                                            {
+                                                            
+                                                            if($('[class="'+$(element).attr('class')+'"]:checked').length)
+                                                            {
+                                                                $('#{{grid.hash}}_search_button').attr('disabled',false)
+                                                            }
+                                                            else{
+                                                                $('#{{grid.hash}}_search_button').attr('disabled',true)
+                                                            }
+                                                             
+                       
+
+                                                            return false;
+                                                            }
+                                                        {% endblock grid_scripts_filter_checkbox %}
+                                                        
                                                         {% block grid_scripts_goto %}
                                                             function {{ grid.hash }}_goto(url)
                                                             {
