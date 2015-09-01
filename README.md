@@ -19,6 +19,7 @@ In order to install the bundle, add:
 //composer require
 
 "tmsolution/datagrid-bundle": "1.*"
+"apy/datagrid-bundle": "2.1.15"
 ```
 
 to your project's `composer.json` file. Later, enable your bundle in the app's kernel:
